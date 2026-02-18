@@ -5,13 +5,12 @@
 
 ## Team Members
 
-| Roll Number | Name              |
-|-------------|-------------------|
-| i23-0744    | Taha Yusuf        |
-| i23-0509    | Muhammad Abdullah |
-| Section     | A                 |
+| Roll Number | Name               |
+|-------------|--------------------|
+| 23i-0733    | Abbas Raza         |
+| 23i-0803    | Abdullah Bin Nasir |
+| Section     | A                  |
 
----
 
 ## Language Overview
 
