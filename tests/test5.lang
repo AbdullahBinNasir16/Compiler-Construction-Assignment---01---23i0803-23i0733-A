@@ -1,0 +1,45 @@
+## test5.lang — Comment handling
+
+## This entire line is a comment and should be ignored
+
+#*
+   This is a multi-line comment.
+   It spans several lines.
+   None of this should produce tokens.
+   declare FakeVar
+   FakeVar = 999
+*#
+
+start
+
+    ## Declare some variables
+    declare Count
+    declare Name
+
+    Count = 0     ## inline comment after token
+
+    #* Another multi-line comment
+       spanning two lines *#
+
+    Name = "Alice"
+
+    #*
+       Nested-looking comment with stars:
+       ** bold ** or ***triple***
+       The closing must be *#
+    *#
+
+    ## Loop with comment inside
+    loop condition Count < 5
+        ## increment inside loop
+        Count++
+        #* multi-line
+           inside loop *#
+    finish
+
+    output Count   ## print the result
+    output Name
+
+finish
+
+## End of file comment

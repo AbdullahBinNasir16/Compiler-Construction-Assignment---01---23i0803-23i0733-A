@@ -1,0 +1,160 @@
+================================================================
+  LanguageGrammar.txt
+  Formal Grammar for CustomLang (.lang)
+  CS4031 - Compiler Construction - Assignment 01
+================================================================
+
+Language Name : CustomLang
+File Extension: .lang
+Paradigm      : Imperative, structured
+Case-Sensitive: Yes
+
+----------------------------------------------------------------
+  LEXICAL GRAMMAR  (Regular Expressions)
+----------------------------------------------------------------
+
+KEYWORD       ::= start | finish | loop | condition | declare
+                | output | input | function | return | break
+                | continue | else
+
+BOOLEAN       ::= true | false
+
+IDENTIFIER    ::= [A-Z][a-z0-9_]{0,30}
+                  (starts with uppercase, max 31 chars total)
+
+INTEGER       ::= [+-]?[0-9]+
+
+FLOAT         ::= [+-]?[0-9]+\.[0-9]{1,6}([eE][+-]?[0-9]+)?
+
+STRING        ::= "([^"\\\n] | \\["\\ntr])*"
+
+CHAR          ::= '([^'\\\n] | \\['\\ntr])'
+
+ARITH_OP      ::= ** | + | - | * | / | %
+
+RELATIONAL_OP ::= == | != | < | > | <= | >=
+
+LOGICAL_OP    ::= && | || | !
+
+ASSIGN_OP     ::= = | += | -= | *= | /=
+
+INC_DEC_OP    ::= ++ | --
+
+PUNCTUATOR    ::= ( | ) | { | } | [ | ] | , | ; | :
+
+COMMENT_SL    ::= ##[^\n]*
+
+COMMENT_ML    ::= #\*([^*]|\*+[^*#])*\*+#
+
+WHITESPACE    ::= [ \t\r\n]+   (skipped)
+
+----------------------------------------------------------------
+  VALID ESCAPE SEQUENCES
+----------------------------------------------------------------
+
+In string literals:  \"  \\  \n  \t  \r
+In char literals:    \'  \\  \n  \t  \r
+
+----------------------------------------------------------------
+  OPERATOR PRECEDENCE  (high to low)
+----------------------------------------------------------------
+
+Level 1 (highest)  :  ++ --              (increment/decrement)
+Level 2            :  ** * / %            (multiplicative)
+Level 3            :  + -                 (additive)
+Level 4            :  < > <= >=          (comparison)
+Level 5            :  == !=               (equality)
+Level 6            :  !                   (logical NOT)
+Level 7            :  &&                  (logical AND)
+Level 8            :  ||                  (logical OR)
+Level 9 (lowest)   :  = += -= *= /=      (assignment)
+
+----------------------------------------------------------------
+  SYNTACTIC GRAMMAR  (Context-Free, BNF)
+  Note: Full syntax analysis is done in the Parser phase.
+        This grammar is provided for reference only.
+----------------------------------------------------------------
+
+program        ::= 'start' stmt_list 'finish'
+
+stmt_list      ::= stmt*
+
+stmt           ::= decl_stmt
+                 | assign_stmt
+                 | output_stmt
+                 | input_stmt
+                 | condition_stmt
+                 | loop_stmt
+                 | function_stmt
+                 | return_stmt
+                 | break_stmt
+                 | continue_stmt
+
+decl_stmt      ::= 'declare' IDENTIFIER
+
+assign_stmt    ::= IDENTIFIER ASSIGN_OP expr
+
+output_stmt    ::= 'output' expr
+
+input_stmt     ::= 'input' IDENTIFIER
+
+condition_stmt ::= 'condition' expr stmt_list
+                   ('else' stmt_list)?
+                   'finish'
+
+loop_stmt      ::= 'loop' 'condition' expr stmt_list 'finish'
+
+function_stmt  ::= 'function' IDENTIFIER stmt_list 'finish'
+
+return_stmt    ::= 'return' expr
+
+break_stmt     ::= 'break'
+
+continue_stmt  ::= 'continue'
+
+expr           ::= expr ARITH_OP expr
+                 | expr RELATIONAL_OP expr
+                 | expr LOGICAL_OP expr
+                 | LOGICAL_OP expr
+                 | IDENTIFIER
+                 | INTEGER
+                 | FLOAT
+                 | STRING
+                 | CHAR
+                 | BOOLEAN
+                 | '(' expr ')'
+
+----------------------------------------------------------------
+  SAMPLE PROGRAM — Hello World
+----------------------------------------------------------------
+
+start
+    declare Msg
+    Msg = "Hello, World!"
+    output Msg
+finish
+
+----------------------------------------------------------------
+  SAMPLE PROGRAM — Fibonacci
+----------------------------------------------------------------
+
+start
+    declare A
+    declare B
+    declare Temp
+    declare Count
+
+    A = 0
+    B = 1
+    Count = 10
+
+    loop condition Count > 0
+        output A
+        Temp = A + B
+        A = B
+        B = Temp
+        Count--
+    finish
+finish
+
+================================================================

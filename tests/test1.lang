@@ -1,0 +1,58 @@
+## test1.lang — All valid token types
+
+start
+
+    ## Integer and float literals
+    declare Count
+    declare Pi
+    declare Flag
+    declare Msg
+    declare Ch
+
+    Count = 42
+    Count = -10
+    Count = +99
+
+    Pi = 3.14
+    Pi = -0.001
+    Pi = 1.5e10
+    Pi = 2.0E-3
+
+    ## Boolean literals
+    Flag = true
+    Flag = false
+
+    ## String literals
+    Msg = "Hello World"
+    Msg = "Tab here"
+
+    ## Character literals
+    Ch = 'A'
+    Ch = 'z'
+
+    ## Keywords as statements
+    output Count
+    output Msg
+    input Count
+
+    ## Loop construct
+    loop condition Count > 0
+        Count = Count - 1
+    finish
+
+    ## Condition construct
+    condition Flag == true
+        output Msg
+    else
+        output Count
+    finish
+
+    ## Function
+    function Add
+        return Count
+    finish
+
+    break
+    continue
+
+finish

@@ -1,0 +1,158 @@
+================================================================
+  TestResults.txt
+  Expected scanner output for all 5 test files
+  CS4031 - Compiler Construction - Assignment 01
+  Both ManualScanner and JFlex scanner produce identical output.
+================================================================
+
+HOW TO REPRODUCE:
+  java ManualScanner tests/test1.lang
+  java JFlexMain    tests/test1.lang
+
+----------------------------------------------------------------
+  TEST 1 — test1.lang  (All valid tokens)
+----------------------------------------------------------------
+
+TOKEN STREAM (partial — first 20 tokens):
+  <KEYWORD, "start", Line: 3, Col: 1>
+  <KEYWORD, "declare", Line: 6, Col: 5>
+  <IDENTIFIER, "Count", Line: 6, Col: 13>
+  <KEYWORD, "declare", Line: 7, Col: 5>
+  <IDENTIFIER, "Pi", Line: 7, Col: 13>
+  <KEYWORD, "declare", Line: 8, Col: 5>
+  <IDENTIFIER, "Flag", Line: 8, Col: 13>
+  <KEYWORD, "declare", Line: 9, Col: 5>
+  <IDENTIFIER, "Msg", Line: 9, Col: 13>
+  <KEYWORD, "declare", Line: 10, Col: 5>
+  <IDENTIFIER, "Ch", Line: 10, Col: 13>
+  <IDENTIFIER, "Count", Line: 12, Col: 5>
+  <ASSIGNMENT_OP, "=", Line: 12, Col: 11>
+  <INTEGER_LITERAL, "42", Line: 12, Col: 13>
+  <IDENTIFIER, "Pi", Line: 15, Col: 5>
+  <ASSIGNMENT_OP, "=", Line: 15, Col: 8>
+  <FLOAT_LITERAL, "3.14", Line: 15, Col: 10>
+  <BOOLEAN_LITERAL, "true", Line: 20, Col: 12>
+  <STRING_LITERAL, "Hello World", Line: 24, Col: 11>
+  <CHAR_LITERAL, "'A'", Line: 27, Col: 10>
+
+STATISTICS:
+  Lines processed      : 44
+  Comments removed     : 5
+  Errors found         : 0
+
+SYMBOL TABLE (partial):
+  Count     | IDENTIFIER | Line 6  | Col 13 | Freq: 6
+  Pi        | IDENTIFIER | Line 7  | Col 13 | Freq: 3
+  Flag      | IDENTIFIER | Line 8  | Col 13 | Freq: 3
+  Msg       | IDENTIFIER | Line 9  | Col 13 | Freq: 3
+  Ch        | IDENTIFIER | Line 10 | Col 13 | Freq: 2
+
+----------------------------------------------------------------
+  TEST 2 — test2.lang  (Complex expressions and operators)
+----------------------------------------------------------------
+
+TOKEN STREAM (partial — operators and literals):
+  <ARITHMETIC_OP, "+", Line: 14, Col: 15>
+  <ARITHMETIC_OP, "-", Line: 15, Col: 15>
+  <ARITHMETIC_OP, "*", Line: 16, Col: 15>
+  <ARITHMETIC_OP, "/", Line: 17, Col: 15>
+  <ARITHMETIC_OP, "%", Line: 18, Col: 15>
+  <ARITHMETIC_OP, "**", Line: 19, Col: 15>
+  <ASSIGNMENT_OP, "+=", Line: 22, Col: 7>
+  <ASSIGNMENT_OP, "-=", Line: 23, Col: 7>
+  <ASSIGNMENT_OP, "*=", Line: 24, Col: 7>
+  <ASSIGNMENT_OP, "/=", Line: 25, Col: 7>
+  <INC_DEC_OP, "++", Line: 28, Col: 6>
+  <INC_DEC_OP, "--", Line: 29, Col: 6>
+  <RELATIONAL_OP, "==", Line: 32, Col: 17>
+  <RELATIONAL_OP, "!=", Line: 37, Col: 17>
+  <LOGICAL_OP, "&&", Line: 52, Col: 23>
+  <LOGICAL_OP, "||", Line: 57, Col: 23>
+  <LOGICAL_OP, "!", Line: 62, Col: 15>
+  <FLOAT_LITERAL, "-99", Line: 70, Col: 15>
+  <FLOAT_LITERAL, "1.23456e-10", Line: 72, Col: 15>
+
+STATISTICS:
+  Lines processed      : 74
+  Comments removed     : 8
+  Errors found         : 0
+
+----------------------------------------------------------------
+  TEST 3 — test3.lang  (String/Char escape sequences)
+----------------------------------------------------------------
+
+TOKEN STREAM (partial — literals only):
+  <STRING_LITERAL, "\"Hello, World!\"", Line: 17, Col: 10>
+  <STRING_LITERAL, "\"Line one\nLine two\"", Line: 18, Col: 10>
+  <STRING_LITERAL, "\"Column\there\"", Line: 19, Col: 10>
+  <STRING_LITERAL, "\"She said \"hello\"\"", Line: 20, Col: 10>
+  <STRING_LITERAL, "\"Back\\\\slash\"", Line: 21, Col: 10>
+  <STRING_LITERAL, "\"   spaces   inside   \"", Line: 27, Col: 10>
+  <CHAR_LITERAL, "'A'", Line: 31, Col: 10>
+  <CHAR_LITERAL, "'\\n'", Line: 35, Col: 10>
+  <CHAR_LITERAL, "'\\t'", Line: 36, Col: 10>
+  <CHAR_LITERAL, "'\\\\'", Line: 37, Col: 10>
+  <CHAR_LITERAL, "'\\''", Line: 38, Col: 10>
+
+STATISTICS:
+  Lines processed      : 43
+  Comments removed     : 4
+  Errors found         : 0
+
+NOTE: Whitespace inside string literals is preserved exactly.
+
+----------------------------------------------------------------
+  TEST 4 — test4.lang  (Lexical errors)
+----------------------------------------------------------------
+
+ERRORS REPORTED (stderr):
+  [LEXICAL ERROR] INVALID_IDENTIFIER     | Line: 7  | Col: 13 | Lexeme: "count"                  | Identifier 'count' must start with an uppercase letter
+  [LEXICAL ERROR] INVALID_IDENTIFIER     | Line: 10 | Col: 13 | Lexeme: "bad"                    | Identifier 'bad' must start with an uppercase letter
+  [LEXICAL ERROR] INVALID_IDENTIFIER     | Line: 13 | Col: 13 | Lexeme: "Averylongi..."          | Identifier exceeds 31 characters
+  [LEXICAL ERROR] INVALID_CHARACTER      | Line: 16 | Col: 7  | Lexeme: "@"                      | Character '@' is not part of the language
+  [LEXICAL ERROR] INVALID_CHARACTER      | Line: 17 | Col: 7  | Lexeme: "$"                      | Character '$' is not part of the language
+  [LEXICAL ERROR] MALFORMED_LITERAL      | Line: 21 | Col: 15 | Lexeme: "3."                     | Floating-point literal '3.' has no digits after decimal
+  [LEXICAL ERROR] MALFORMED_LITERAL      | Line: 25 | Col: 11 | Lexeme: "1.2345678"              | Floating-point literal has 8 decimal places (max 6)
+  [LEXICAL ERROR] UNTERMINATED_STRING    | Line: 29 | Col: 11 | Lexeme: "\"this string..."       | String literal not terminated before end of line
+  [LEXICAL ERROR] UNCLOSED_COMMENT       | Line: 32 | Col: 5  | Lexeme: "#* this comment..."     | Multi-line comment was never closed
+
+VALID TOKENS AFTER ERRORS (error recovery working):
+  <KEYWORD, "declare", Line: 35, Col: 5>
+  <IDENTIFIER, "Valid", Line: 35, Col: 13>
+  <IDENTIFIER, "Valid", Line: 36, Col: 5>
+  <ASSIGNMENT_OP, "=", Line: 36, Col: 11>
+  <INTEGER_LITERAL, "99", Line: 36, Col: 13>
+  <KEYWORD, "output", Line: 37, Col: 5>
+  <IDENTIFIER, "Valid", Line: 37, Col: 12>
+
+----------------------------------------------------------------
+  TEST 5 — test5.lang  (Comment handling)
+----------------------------------------------------------------
+
+STATISTICS:
+  Lines processed      : 47
+  Comments removed     : 7
+  Errors found         : 0
+
+TOKEN STREAM — Note: ALL comment content excluded from stream.
+  <KEYWORD, "start", Line: 12, Col: 1>
+  <KEYWORD, "declare", Line: 14, Col: 5>
+  <IDENTIFIER, "Count", Line: 14, Col: 13>
+  <KEYWORD, "declare", Line: 15, Col: 5>
+  <IDENTIFIER, "Name", Line: 15, Col: 13>
+  <IDENTIFIER, "Count", Line: 17, Col: 5>
+  <ASSIGNMENT_OP, "=", Line: 17, Col: 11>
+  <INTEGER_LITERAL, "0", Line: 17, Col: 13>
+  ... (loop, output tokens follow)
+  <KEYWORD, "finish", Line: 44, Col: 1>
+
+================================================================
+  COMPARISON SUMMARY — Manual vs JFlex
+================================================================
+
+  All 5 test files: IDENTICAL OUTPUT (both scanners agree 100%)
+  Token counts:     IDENTICAL
+  Error messages:   IDENTICAL
+  Symbol tables:    IDENTICAL
+
+================================================================

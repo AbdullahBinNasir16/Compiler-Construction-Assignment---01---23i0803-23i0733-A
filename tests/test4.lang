@@ -1,0 +1,38 @@
+## test4.lang — Lexical errors (tests error detection and recovery)
+
+start
+
+    ## Error 1: identifier starting with lowercase
+    declare count
+
+    ## Error 2: identifier starting with digit (scanner sees it as number + word)
+    declare 2bad
+
+    ## Error 3: identifier exceeding 31 characters
+    declare Averylongidentifiernamethatexceedsthirtyone
+
+    ## Error 4: invalid characters
+    X = @symbol
+    Y = $dollar
+
+    ## Error 5: malformed float — no digit after decimal
+    declare Broken
+    Broken = 3.
+
+    ## Error 6: malformed float — too many decimal places
+    declare Bad
+    Bad = 1.2345678
+
+    ## Error 7: unterminated string
+    declare Msg
+    Msg = "this string never ends
+
+    ## Error 8: unclosed multi-line comment
+    #* this comment is never closed
+
+    ## Valid tokens below should still be scanned (error recovery)
+    declare Valid
+    Valid = 99
+    output Valid
+
+finish

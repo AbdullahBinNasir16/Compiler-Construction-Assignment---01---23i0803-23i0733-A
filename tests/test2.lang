@@ -1,0 +1,78 @@
+## test2.lang — Complex expressions and all operators
+
+start
+
+    declare A
+    declare B
+    declare Result
+
+    A = 10
+    B = 3
+
+    ## Arithmetic operators
+    Result = A + B
+    Result = A - B
+    Result = A * B
+    Result = A / B
+    Result = A % B
+    Result = A ** B
+
+    ## Compound assignment
+    A += 5
+    A -= 2
+    A *= 3
+    A /= 4
+
+    ## Increment / Decrement
+    A++
+    B--
+
+    ## Relational operators
+    condition A == B
+        output A
+    finish
+
+    condition A != B
+        output B
+    finish
+
+    condition A < B
+        output A
+    finish
+
+    condition A > B
+        output B
+    finish
+
+    condition A <= 100
+        output A
+    finish
+
+    condition A >= 0
+        output B
+    finish
+
+    ## Logical operators
+    condition A > 0 && B > 0
+        Result = A + B
+    finish
+
+    condition A > 0 || B > 0
+        Result = A - B
+    finish
+
+    condition !false
+        output Result
+    finish
+
+    ## Punctuators
+    declare Arr
+    Arr = (A + B)
+    Result = A * (B + 2)
+
+    ## Signed numbers in expressions
+    Result = -99
+    Result = +42
+    Result = 1.23456e-10
+
+finish

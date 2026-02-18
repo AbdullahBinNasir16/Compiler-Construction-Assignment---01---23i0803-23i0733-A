@@ -1,0 +1,49 @@
+## test3.lang — String and character literals with escape sequences
+
+start
+
+    declare S1
+    declare S2
+    declare S3
+    declare S4
+    declare S5
+    declare C1
+    declare C2
+    declare C3
+    declare C4
+    declare C5
+
+    ## String escape sequences
+    S1 = "Hello, World!"
+    S2 = "Line one\nLine two"
+    S3 = "Column\there"
+    S4 = "She said \"hello\""
+    S5 = "Back\\slash"
+
+    ## Carriage return escape
+    S1 = "Return\rHere"
+
+    ## String with internal spaces (whitespace preserved)
+    S2 = "   spaces   inside   "
+
+    ## String with digits and symbols
+    S3 = "Count = 42 done"
+
+    ## Character literals
+    C1 = 'A'
+    C2 = 'z'
+    C3 = '5'
+
+    ## Character escape sequences
+    C4 = '\n'
+    C5 = '\t'
+    C1 = '\\'
+    C2 = '\''
+
+    output S1
+    output S2
+    output S3
+    output C1
+    output C2
+
+finish
