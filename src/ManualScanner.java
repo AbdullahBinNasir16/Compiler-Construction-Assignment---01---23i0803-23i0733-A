@@ -2,83 +2,63 @@ import java.util.*;
 import java.io.*;
 import java.nio.file.*;
 
-/**
- * ============================================================
- *  ManualScanner.java
- *  DFA-based Lexical Analyzer for CustomLang (.lang)
- *  CS4031 - Compiler Construction - Assignment 01
- * ============================================================
- *
- *  Features:
- *    A. Token Recognition  - All token types, DFA-based, longest match
- *    B. Pre-processing     - Whitespace removal, string preservation, line/col tracking
- *    C. Token Output       - <TYPE, "lexeme", Line: N, Col: N>
- *    D. Statistics         - Total tokens, per-type counts, lines, comments removed
- *    E. Symbol Table       - Identifier name, type, first occurrence, frequency
- *
- *  Usage:
- *    javac TokenType.java Token.java SymbolTable.java ErrorHandler.java ManualScanner.java
- *    java ManualScanner <source_file.lang>
- * ============================================================
+/*
+   Features:
+     A. Token Recognition  - All token types, DFA-based, longest match
+     B. Pre-processing     - Whitespace removal, string preservation, line/col tracking
+     C. Token Output       - <TYPE, "lexeme", Line: N, Col: N>
+     D. Statistics         - Total tokens, per-type counts, lines, comments removed
+     E. Symbol Table       - Identifier name, type, first occurrence, frequency
  */
 public class ManualScanner {
 
-    // ================================================================
-    //  SECTION 1 — FIELDS
-    // ================================================================
+    // fields
 
     private final String        source;         // full source code string
     private       int           pos;            // current index into source
-    private       int           line;           // current line number (1-based)
-    private       int           col;            // current column number (1-based)
+    private       int           line;           // current line number
+    private       int           col;            // current column number 
 
     private final List<Token>            tokens       = new ArrayList<>();
     private final SymbolTable            symbolTable  = new SymbolTable();
     private final ErrorHandler           errorHandler = new ErrorHandler();
     private final Map<TokenType,Integer> tokenCounts  = new LinkedHashMap<>();
 
-    // Statistics counters
+    // stats counters
     private int commentsRemoved = 0;
     private int linesProcessed  = 0;
 
-    // Keyword set — all 12 required keywords
+    //all 12 required keywords
     private static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList(
         "start", "finish", "loop", "condition", "declare",
         "output", "input", "function", "return", "break",
         "continue", "else"
     ));
 
-    // ================================================================
-    //  SECTION 2 — CONSTRUCTOR
-    // ================================================================
+    // constructor
 
     public ManualScanner(String source) {
         this.source = source;
         this.pos    = 0;
         this.line   = 1;
         this.col    = 1;
-        // Pre-populate all token type counts at 0
+        // Initialize token counts to 0 for all types
         for (TokenType t : TokenType.values()) {
             tokenCounts.put(t, 0);
         }
     }
 
-    // ================================================================
-    //  SECTION 3 — PUBLIC ENTRY POINT
-    // ================================================================
+    // public entry point
 
-    /**
-     * Tokenize the entire source string.
-     * Returns the list of meaningful tokens (comments and whitespace excluded).
-     */
+    //tokenize entrire string and return list of tokens
     public List<Token> tokenize() {
         while (pos < source.length()) {
 
-            // B. Pre-processing: skip whitespace between tokens
+            // skip whitespace between tokens
             skipWhitespace();
             if (pos >= source.length()) break;
 
-            // Snapshot position before consuming
+            // snapshot position before consuming
             int tokLine = line;
             int tokCol  = col;
 
@@ -86,24 +66,24 @@ public class ManualScanner {
             if (t == null) continue;
 
             switch (t.getType()) {
-                // Comments: count but do NOT add to token list
+                // comments count but do not add to token list
                 case SINGLE_LINE_COMMENT:
                 case MULTI_LINE_COMMENT:
                     commentsRemoved++;
                     tokenCounts.merge(t.getType(), 1, Integer::sum);
                     break;
 
-                // Errors: add to list for reporting but don't count as real tokens
+                // errors add to list for reporting but dont count as real tokens
                 case ERROR:
                     tokens.add(t);
                     tokenCounts.merge(TokenType.ERROR, 1, Integer::sum);
                     break;
 
-                // All real tokens
+                // all real tokens are added to the list and counted
                 default:
                     tokens.add(t);
                     tokenCounts.merge(t.getType(), 1, Integer::sum);
-                    // E. Symbol Table: register every identifier
+                    // register every identifier in symbil tbl
                     if (t.getType() == TokenType.IDENTIFIER) {
                         symbolTable.insert(t.getLexeme(), t.getLine(), t.getColumn());
                     }
@@ -115,8 +95,7 @@ public class ManualScanner {
         return Collections.unmodifiableList(tokens);
     }
 
-    // ================================================================
-    //  SECTION 4 — CORE DISPATCHER
+    //  Core Dispatcher
     //  Follows the priority order from Section 3.12 of the spec:
     //  1  Multi-line comment
     //  2  Single-line comment
@@ -126,69 +105,61 @@ public class ManualScanner {
     //  6  Identifiers
     //  7  Floating-point literals
     //  8  Integer literals
-    //  9  String / character literals
-    //  10 Single-character operators
+    //  9  String literals
+    //  10 Single character operators
     //  11 Punctuators
-    //  12 Whitespace  (handled by skipWhitespace before this point)
-    // ================================================================
+    //  12 Whitespace 
 
     private Token nextToken(int sl, int sc) {
 
         char c0 = peek(0);
         char c1 = peek(1);
 
-        // ---- Priority 1: Multi-line comment  #* ... *# ----
+        // Multi-line comment 
         if (c0 == '#' && c1 == '*') {
             return scanMultiLineComment(sl, sc);
         }
 
-        // ---- Priority 2: Single-line comment  ## ... ----
+        // Single-line comment  
         if (c0 == '#' && c1 == '#') {
             return scanSingleLineComment(sl, sc);
         }
 
-        // ---- Priority 3: Multi-character operators (longest match) ----
-        // Must come before single-char operators to handle **, ==, !=, <=, >=,
-        // &&, ||, ++, --, +=, -=, *=, /=
+        // Multi character operators 
         Token multiOp = tryMultiCharOperator(sl, sc);
         if (multiOp != null) return multiOp;
 
-        // ---- Priorities 4-6: Words (keyword / boolean / identifier) ----
-        // Any letter or underscore starts a word
+        // Words (keyword / boolean / identifier) 
         if (Character.isLetter(c0) || c0 == '_') {
             return scanWord(sl, sc);
         }
 
-        // ---- Priorities 7-8: Numbers (float checked before integer) ----
-        // A sign (+/-) followed by a digit is a numeric literal ONLY if the
-        // previous meaningful token was not a value (no ambiguity with binary +/-)
-        boolean signedNumber = (c0 == '+' || c0 == '-')
-                               && isDigit(c1)
-                               && !prevTokenIsValue();
+        //Numbers (float checked before integer)
+        boolean signedNumber = (c0 == '+' || c0 == '-') && isDigit(c1) && !prevTokenIsValue();
 
         if (isDigit(c0) || signedNumber) {
             return scanNumber(sl, sc);
         }
 
-        // ---- Priority 9a: String literal ----
+        // String literal 
         if (c0 == '"') {
             return scanStringLiteral(sl, sc);
         }
 
-        // ---- Priority 9b: Character literal ----
+        //Character literal 
         if (c0 == '\'') {
             return scanCharLiteral(sl, sc);
         }
 
-        // ---- Priority 10: Single-character operators ----
+        //  Single-character operators 
         Token singleOp = trySingleCharOperator(sl, sc);
         if (singleOp != null) return singleOp;
 
-        // ---- Priority 11: Punctuators ----
+        // Punctuators
         Token punct = tryPunctuator(sl, sc);
         if (punct != null) return punct;
 
-        // ---- Unknown character — error recovery ----
+        //Unknown character 
         char bad = consume();
         errorHandler.report(
             ErrorHandler.ErrorType.INVALID_CHARACTER,
@@ -198,12 +169,8 @@ public class ManualScanner {
         return new Token(TokenType.ERROR, String.valueOf(bad), sl, sc);
     }
 
-    // ================================================================
-    //  SECTION 5 — B. PRE-PROCESSING
-    //  skipWhitespace: removes all whitespace between tokens.
-    //  Whitespace INSIDE string/char literals is preserved because
-    //  those scan methods consume characters raw without calling this.
-    // ================================================================
+    //  PRE-PROCESSING
+    // mremoves all whitespace between tokens
 
     private void skipWhitespace() {
         while (pos < source.length() && isWhitespace(peek(0))) {
@@ -211,14 +178,12 @@ public class ManualScanner {
         }
     }
 
-    // ================================================================
-    //  SECTION 6 — COMMENT SCANNERS
-    // ================================================================
+    // comment scanners
 
-    /**
-     * Single-line comment: ##[^\n]*
-     * Consume everything up to (but not including) the newline.
-     */
+    
+    //   Single-line comment: ##[^\n]*
+    //   Consume everything up to (but not including) the newline.
+     
     private Token scanSingleLineComment(int sl, int sc) {
         StringBuilder sb = new StringBuilder();
         sb.append(consume()); // first  #
@@ -229,10 +194,10 @@ public class ManualScanner {
         return new Token(TokenType.SINGLE_LINE_COMMENT, sb.toString(), sl, sc);
     }
 
-    /**
-     * Multi-line comment: #\* ... \*#
-     * The closing sequence is one or more '*' followed by '#'.
-     */
+    
+    //  Multi-line comment: #\* ... \*#
+    //  The closing sequence is one or more '*' followed by '#'.
+     
     private Token scanMultiLineComment(int sl, int sc) {
         StringBuilder sb = new StringBuilder();
         sb.append(consume()); // #
@@ -249,7 +214,7 @@ public class ManualScanner {
                     sb.append(consume()); // closing #
                     return new Token(TokenType.MULTI_LINE_COMMENT, sb.toString(), sl, sc);
                 }
-                // Not closed yet — the star(s) were not the end
+                // Not closed yet 
             } else {
                 sb.append(consume());
             }
@@ -264,35 +229,33 @@ public class ManualScanner {
         return new Token(TokenType.ERROR, sb.toString(), sl, sc);
     }
 
-    // ================================================================
-    //  SECTION 7 — WORD SCANNER  (keyword / boolean / identifier)
+    // Word scanner (keywords, boolean literals, identifiers)
     //  DFA states:
     //    q0 (start) --[letter|_]--> q1 (reading word chars)
     //    q1          --[letter|digit|_]--> q1
     //    q1          --[other]--> ACCEPT (classify)
-    // ================================================================
 
     private Token scanWord(int sl, int sc) {
         StringBuilder sb = new StringBuilder();
 
-        // Consume all identifier-valid characters
+        // Consume all identifier valid characters
         while (pos < source.length() && isIdentChar(peek(0))) {
             sb.append(consume());
         }
 
         String word = sb.toString();
 
-        // Priority 4: check keywords first
+        // check keywords first
         if (KEYWORDS.contains(word)) {
             return new Token(TokenType.KEYWORD, word, sl, sc);
         }
 
-        // Priority 5: boolean literals
+        // boolean literals
         if (word.equals("true") || word.equals("false")) {
             return new Token(TokenType.BOOLEAN_LITERAL, word, sl, sc);
         }
 
-        // Priority 6: identifiers — must start with uppercase A-Z
+        // identifiers — must start with uppercase A-Z
         if (Character.isUpperCase(word.charAt(0))) {
             // Validate max length (31 characters total)
             if (word.length() > 31) {
@@ -314,8 +277,7 @@ public class ManualScanner {
         return new Token(TokenType.ERROR, word, sl, sc);
     }
 
-    // ================================================================
-    //  SECTION 8 — NUMBER SCANNER  (float and integer)
+    // number scanner (float and integer)
     //
     //  Float DFA:
     //    q0 --[+|-]--> q1 --[digit]--> q2 --[.]--> q3 --[digit(1-6)]--> q4 (ACCEPT)
@@ -327,8 +289,7 @@ public class ManualScanner {
     //    q0 --[digit]--> q2 (ACCEPT)
     //    q2 --[digit]--> q2
     //
-    //  Float is tried FIRST (longest match principle).
-    // ================================================================
+    //  Float is tried FIRST (longest match principle)
 
     private Token scanNumber(int sl, int sc) {
         StringBuilder sb = new StringBuilder();
@@ -343,7 +304,7 @@ public class ManualScanner {
             sb.append(consume());
         }
 
-        // ---- Try floating-point branch ----
+        // Try floating-point branch 
         // Must have '.' followed by at least one digit
         if (peek(0) == '.' && isDigit(peek(1))) {
             sb.append(consume()); // consume '.'

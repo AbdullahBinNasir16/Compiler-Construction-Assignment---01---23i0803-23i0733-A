@@ -1,8 +1,4 @@
-/**
- * Token.java
- * Represents a single token produced by the lexical analyzer.
- * CS4031 - Compiler Construction - Assignment 01
- *
+/*
  * Stores:
  *   - TokenType  : the category of the token
  *   - lexeme     : the exact string from the source code

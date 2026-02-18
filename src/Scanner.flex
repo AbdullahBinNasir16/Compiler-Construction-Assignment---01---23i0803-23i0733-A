@@ -1,9 +1,4 @@
-/* ================================================================
-   Scanner.flex
-   JFlex Lexical Specification for CustomLang (.lang)
-   CS4031 - Compiler Construction - Assignment 01
-   Part 2: JFlex Implementation
-
+/* 
    Mirrors the exact priority order of ManualScanner.java:
      1.  Multi-line comments
      2.  Single-line comments

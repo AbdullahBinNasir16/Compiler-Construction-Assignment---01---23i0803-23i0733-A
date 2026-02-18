@@ -1,8 +1,4 @@
-/**
- * TokenType.java
- * Enumeration of all token categories for CustomLang.
- * CS4031 - Compiler Construction - Assignment 01
- */
+
 public enum TokenType {
 
     // ── Literals ──────────────────────────────────────────────────

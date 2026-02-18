@@ -1,10 +1,6 @@
 import java.util.*;
 
-/**
- * SymbolTable.java
- * Tracks all identifiers encountered during scanning.
- * CS4031 - Compiler Construction - Assignment 01
- *
+/*
  * For each identifier, stores:
  *   - name           : the identifier string
  *   - type           : token type (always "IDENTIFIER" at lex phase)
