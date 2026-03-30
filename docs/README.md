@@ -262,7 +262,7 @@ diff ../tests/manual_out.txt ../tests/jflex_out.txt
 ## Project Structure
 
 ```
-i23-0744-i23-0509-A/
+i23-0803-i23-0733-A/
 ├── src/
 │   ├── ManualScanner.java   # DFA-based hand-written scanner
 │   ├── Token.java           # Token data class
